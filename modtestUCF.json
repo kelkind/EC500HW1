@@ -4977,11 +4977,11 @@
         "parameters": [
             {
                 "name": "ymax",
-                "value": 3.8
+                "value": 5.699999999999999
             },
             {
                 "name": "ymin",
-                "value": 0.06
+                "value": 0.04
             },
             {
                 "name": "K",
@@ -4995,8 +4995,8 @@
         "variables": [
             {
                 "name": "x",
-                "off_threshold": 0.071418036,
-                "on_threshold": 0.917082477
+                "off_threshold": 0.07062112434173835,
+                "on_threshold": 1.5395568935330453
             }
         ]
     },
@@ -5067,11 +5067,11 @@
         "parameters": [
             {
                 "name": "ymax",
-                "value": 0.8
+                "value": 1.2000000000000002
             },
             {
                 "name": "ymin",
-                "value": 0.01
+                "value": 0.006666666666666667
             },
             {
                 "name": "K",
@@ -5085,8 +5085,8 @@
         "variables": [
             {
                 "name": "x",
-                "off_threshold": 0.261943294,
-                "on_threshold": 0.936422328
+                "off_threshold": 0.26085583434823223,
+                "on_threshold": 1.1936076234831583
             }
         ]
     },
@@ -5097,26 +5097,26 @@
         "parameters": [
             {
                 "name": "ymax",
-                "value": 99
+                "value": 1.9
             },
             {
                 "name": "ymin",
-                "value": 99
+                "value": 0.035
             },
             {
                 "name": "K",
-                "value": 99
+                "value": 0.41
             },
             {
                 "name": "n",
-                "value": 99
+                "value": 2.4
             }
         ],
         "variables": [
             {
                 "name": "x",
-                "off_threshold": 0.41646314,
-                "on_threshold": 2.131948906
+                "off_threshold": 0.41646314046801963,
+                "on_threshold": 2.1319489062873567
             }
         ]
     },
@@ -5157,11 +5157,11 @@
         "parameters": [
             {
                 "name": "ymax",
-                "value": 2.5
+                "value": 3.75
             },
             {
                 "name": "ymin",
-                "value": 0.07
+                "value": 0.04666666666666667
             },
             {
                 "name": "K",
@@ -5175,8 +5175,8 @@
         "variables": [
             {
                 "name": "x",
-                "off_threshold": 0.194258377,
-                "on_threshold": 0.735147282
+                "off_threshold": 0.19185077615132123,
+                "on_threshold": 1.0168230138083256
             }
         ]
     },
@@ -5307,11 +5307,11 @@
         "parameters": [
             {
                 "name": "ymax",
-                "value": 4.1
+                "value": 2.05
             },
             {
                 "name": "ymin",
-                "value": 0.02
+                "value": 0.01
             },
             {
                 "name": "K",
@@ -5325,8 +5325,8 @@
         "variables": [
             {
                 "name": "x",
-                "off_threshold": 0.130327211,
-                "on_threshold": 0.507702151
+                "off_threshold": 0.13032721111010465,
+                "on_threshold": 0.507702150595784
             }
         ]
     },
@@ -5367,11 +5367,11 @@
         "parameters": [
             {
                 "name": "ymax",
-                "value": 2.4
+                "value": 3.5999999999999996
             },
             {
                 "name": "ymin",
-                "value": 0.01
+                "value": 0.006666666666666667
             },
             {
                 "name": "K",
@@ -5385,8 +5385,8 @@
         "variables": [
             {
                 "name": "x",
-                "off_threshold": 0.050155208,
-                "on_threshold": 0.379475457
+                "off_threshold": 0.050068761671639817,
+                "on_threshold": 0.5132995070400121
             }
         ]
     },
@@ -5487,11 +5487,11 @@
         "parameters": [
             {
                 "name": "ymax",
-                "value": 2.1
+                "value": 3.1500000000000004
             },
             {
                 "name": "ymin",
-                "value": 0.003
+                "value": 0.002
             },
             {
                 "name": "K",
@@ -5505,8 +5505,8 @@
         "variables": [
             {
                 "name": "x",
-                "off_threshold": 0.040044043,
-                "on_threshold": 0.49642145
+                "off_threshold": 0.04001955321141264,
+                "on_threshold": 0.6785331005529708
             }
         ]
     },

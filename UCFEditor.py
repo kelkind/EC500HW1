@@ -23,8 +23,8 @@ class UCFEditor:
             params = repsr["parameters"]
             for i in range(4):
                 params[i]["value"] = values[i]
-            repsr["variables"][0]["off_threshold"] = values[4]
-            repsr["variables"][0]["on_threshold"] = values[5]
+            repsr["variables"][0]["off_threshold"] = values[4][1]
+            repsr["variables"][0]["on_threshold"] = values[4][0]
 
     def list_repressors(self):
         res = []
@@ -36,8 +36,8 @@ class UCFEditor:
         repsr = self._JSON_data[self._repressors[repressor_name]]
         params = repsr["parameters"]
         return [params[0]["value"], params[1]["value"], params[2]["value"],
-                params[3]["value"], [repsr["variables"][0]["off_threshold"],
-                       repsr["variables"][0]["on_threshold"]]]
+                params[3]["value"], [repsr["variables"][0]["on_threshold"],
+                       repsr["variables"][0]["off_threshold"]]]
 
     def save_ucf_to_json(self, output_path):
         with codecs.open(output_path, "w", encoding = "utf-8") as data_file:

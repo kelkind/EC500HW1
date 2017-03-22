@@ -5,6 +5,7 @@ from CelloProvider import CelloConnection
 from UCFEditor import UCFEditor
 from ToolOperations import *
 from ParseResults import *
+import numpy as np
 
   
 def get_user_inputs():
@@ -25,39 +26,17 @@ def get_user_inputs():
 def run_Cello(fname, gtype, uname, pword, jid, rname):
     cello = CelloConnection((uname, pword))
     
-#    cello.upload_ucf("./testUCF.json")
-#
-#    cello.submit_job(jid, gtype, "./Inputs.txt","./Outputs.txt",
-#                     "options=-UCF testUCF.json -plasmid false -eugene false")
+    cello.upload_ucf("./" + fname)
+
+    cello.submit_job(jid, gtype, "./Inputs.txt","./Outputs.txt",
+                     "options=-UCF testUCF.json -plasmid false -eugene false")
 
     for result in cello.get_job_results(jid):
         if "logic_circuit.txt" in result.get_name():
             result.download_to_file("./" + rname)
 
-def score_function(assembly_order, params):
-    stored_value = {}
-    for gate in assembly_order:
-        if str(gate) in "Output":
-            score = assemble(gate, params, stored_value)
-        else:
-            stored_value = assemble(gate, params, stored_value)
-    return score
-
-if __name__ == '__main__':
-    ed = UCFEditor()
-    circuit_tree = parse_cello_results_file("resultsTesting.txt")
-
-
-    fname = "testUCF.json"
-    gtype = "./AND.v"
-    uname = "kelkind"
-    pword = "4L83rtO1"
-    jid = "KatTest"
-    rname = "resultsTesting.txt"
-    
-    run_Cello(fname, gtype, uname, pword, jid, rname)
-
-#    parse the results file, get:
+def populate_lists(circuit_tree):
+    ed.load_ucf_from_json(fname)
     reps, proms = [], [] 
 
     for gate in circuit_tree:
@@ -65,21 +44,11 @@ if __name__ == '__main__':
             proms += [gate.get_name()]
         elif str(gate) in ("Nor", "Not"):
             reps += [gate.get_name()]
-    
-#    count = 1
-#    for gate in circuit_tree: 
-##        if isinstance(gate, Output):
-##            print_via_depth_first_traversal(gate, 0)
-#        numInputs = len(proms)
-#        if isinstance(gate, Input):
-#            print_via_depth_reverse(gate, 0, count)
-#            count += 1
-#        
-    ed.load_ucf_from_json(fname)
-
+        
     reps_params = {}
     for gate in reps:
         reps_params[gate] = ed.get_repressor_params(gate)
+    rp_copy = reps_params.copy()
     
     proms_params = {}
     for p in proms:
@@ -88,71 +57,94 @@ if __name__ == '__main__':
                 if p in line:
                     parts = line.split()
                     proms_params[p] = [parts[1], parts[2]]
-
-#   calculate score 
-#    stored_value = {}
+                    
     assembly_order = []
     for gate in circuit_tree:
         if isinstance(gate, Output):
             gate.populate_subtree_list(assembly_order)
-#            assembly_order += [gate.get_value()]
-    print(assembly_order)
-    
-    score = score_function(assembly_order, [proms_params,reps_params])
-    print(score)    
-    
-#    for gate in reps:
-#        for sf in np.linspace(0.05,1.5,20):
-#            reps_params[gate] = stretch(reps_params[gate],sf)
-#            adj_score = assemble("Output",[proms_params,reps_params],
-#                                 s_value)
-#            if adj_score > score:
-#                pass
+            
+    return assembly_order, proms, reps, proms_params, reps_params, rp_copy
 
+if __name__ == '__main__':
+    ed = UCFEditor()
     
-#            stored_value = run_start_to_finish(gate,[proms_params,reps_params],
-#                                               stored_value)
-                
-
-    # set the parameters for a repressor, parameter can be a list, etc
-#    ed.set_repressor_params(repsrs_list[0], [99, 99, 99, 99])
-
-#    ed.save_ucf_to_json("testUCFedited.json")
+    fname, gtype = "testUCF.json", "./0xFE.v"
+    uname, pword = "kelkind", "4L83rtO1"
+    jid = "KatTest"
+    rname = "Results_0xFE_BASE.txt"
     
-    # data for P3_PhlF
-#    dataIn = [6.8, 0.02, .23, 4.2, [0.920133536,0.230323307]]
-#    state = [0, 0, 0, 1]
-#    inVals = [2.100 + 3.683, 2.1 + 0.072, .003 + 3.683, .003 + .072]
-#    print('Initial Values for P3_PhlF:')
-#    TO.reportData(dataIn, state, inVals)
-#    
-#    print('\nStretch:')
-#    dataOut = TO.stretch(dataIn, state, inVals)
-#    TO.reportData(dataOut, state, inVals)
-#    score = TO.calcScore(dataOut, state, inVals)
-#    print('score:',score)
-#
-#    dataIn = [6.8, 0.02, .23, 4.2, [0.920133536,0.230323307]]
-#
-#    print('\nIncrease Slope:')
-#    dataOut = TO.changeSlope(dataIn, state, inVals, 'i')
-#    TO.reportData(dataOut, state, inVals)
-#    score = TO.calcScore(dataOut, state, inVals)
-#    print('score:',score)
-#    
-#    dataIn = [6.8, 0.02, .23, 4.2, [0.920133536,0.230323307]]
-#
-#
-#    print('\nStrong Promoter:')
-#    dataOut = TO.Prom(dataIn, state, inVals, 's')
-#    TO.reportData(dataOut, state, inVals)
-#    score = TO.calcScore(dataOut, state, inVals)
-#    print('score:',score)
-# 
-#    dataIn = [6.8, 0.02, .23, 4.2, [0.920133536,0.230323307]]
-#
-#    print('\nWeak RBS')
-#    dataOut = TO.RBS(dataIn, state, inVals, 'w')
-#    TO.reportData(dataOut, state, inVals)
-#    score = TO.calcScore(dataOut, state, inVals)
-#    print('score:',score)
+#    run_Cello(fname, gtype, uname, pword, jid, rname)
+
+    circuit_tree = parse_cello_results_file(rname)
+
+    assembly_order, proms, reps, proms_params, reps_params, rp_copy = populate_lists(circuit_tree)
+    
+    score = scoreFunction(assembly_order, [proms_params,reps_params])
+    print(score)
+    
+    # preallocates and defines values for the optimization loop
+    opsList = ['stretch','incSlope','decSlope','strProm','wkProm','strRBS',
+               'wkRBS']
+    temp_params, temp_score = {}, {}
+    oldScore, maxScoreVal = [score], 0 # initialized as the score to beat
+
+    # optimization loop
+    for g in assembly_order: 
+        if isinstance(g, Output):
+            pass
+        elif isinstance(g, Input):
+            pass
+        else:
+            i = 0
+            gate = g.get_name()
+            print('gate:',gate)
+            temp_params[gate], temp_score[gate] = {}, {}
+            while maxScoreVal <= oldScore[i-1]:
+                for op in opsList:
+                    if "stretch" in op:
+                        linmax = 1.5
+                    elif "Slope" in op:
+                        linmax = 1.05
+                    else:
+                        linmax = 2
+                    for sf in np.linspace(0.05,linmax,30):
+                        temp_params[gate][op] = modifyGate(reps_params[gate],op,sf)
+                        rp_copy[gate] = temp_params[gate][op]
+                        temp_score[gate][op] = scoreFunction(assembly_order,
+                                  [proms_params,rp_copy])      
+                maxScore = max(temp_score[gate], key=lambda key: temp_score[gate][key]) 
+                maxScoreVal = temp_score[gate][maxScore]
+                if i == 0:
+                    break
+                if maxScoreVal < oldScore[i-1]:
+                    rp_copy[reps[i-1]] = temp_params[reps[i-1]][oldScore]
+#            print(temp_score[gate])
+#            print(maxScore,':',temp_score[gate][maxScore])
+            rp_copy[gate] = temp_params[gate][maxScore] # keeps highest scoring change
+            try:
+                oldScore[i] = temp_score[gate][maxScore]
+            except:
+                oldScore += [temp_score[gate][maxScore]]
+            i += 1
+ 
+    score = scoreFunction(assembly_order, [proms_params,reps_params])
+    print('Final Score:', score)
+    
+    for gate in reps:    
+#        print(gate,":")
+#        print(rp_copy[gate])
+        ed.set_repressor_params(gate,rp_copy[gate])
+        
+    fname = "mod" + fname    
+    ed.save_ucf_to_json("./" + fname)
+    
+    rname = "verifyresults" + gtype[:-2] + ".txt"
+    run_Cello(fname, gtype, uname, pword, jid, rname)
+    
+    circuit_tree_new = parse_cello_results_file(rname)
+
+    assembly_order_new, reps_params_new, rp_copy_new, proms_params_new = populate_lists(circuit_tree)
+    
+    new_score = scoreFunction(assembly_order_new, [proms_params_new,reps_params_new])
+    print(new_score)
+    

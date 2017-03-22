@@ -1,4 +1,4 @@
-++++++++++
+
 ----- Logic Circuit #0 -----
 OUTPUT      0001              YFP               0  (1)         328.00  tox:0.88
 NOT         1100              A1_AmtR           3  (4)          51.00  tox:0.96
