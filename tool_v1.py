@@ -6,21 +6,27 @@ from UCFEditor import UCFEditor
 from ParseResults import *
 from ToolOperations import *
 from ToolFunctions import *
+import sys
 #import numpy as np
 
   
 def get_user_inputs():
-    UCFname = input('UCF file name: ') # gets user input
-    vFile = input('Verilog File: ') # gets gate type (AND, etc.)
+    """
+    Prompt to provide all of their user and file information to run Cello.
+    Asks for: UCF file name, Verilog File name, Cello Username, Cello Password
+    Job ID, and Results File (where to store results)
+    """
+    UCFname = raw_input('UCF file name: ') # gets user input
+    vFile = raw_input('Verilog File: ') # gets gate type (AND, etc.)
     if ".v" not in vFile:
         vFile += ".v"
     if "/" not in vFile:
         vFile = "./" + vFile
-    uname = input('Cello Username: ') # gets username
-    pword = input('Cello Password: ') # gets password
-    jobID = input('Define Job ID: ') # gets new job ID
-    resultsFile = input('Results File Name: ') # gets filename to store results
-    if "." not in resultsFile:
+    uname = raw_input('Cello Username: ') # gets username
+    pword = raw_input('Cello Password: ') # gets password
+    jobID = raw_input('Define Job ID: ') # gets new job ID
+    resultsFile = raw_input('Results File Name: ') # gets filename to store results
+    if ".txt" not in resultsFile:
         resultsFile += ".txt" 
     return UCFname, vFile, uname, pword, jobID, resultsFile
 
@@ -44,6 +50,27 @@ def run_Cello(UCFname, vFile, uname, pword, jobID, resultsFile):
 
 
 if __name__ == '__main__':
+    if len(sys.argv)==1 or sys.argv[1]=="--help":
+        print("Welcome to Optron, the Cello Optimization Tool")
+        print("Usage: Optron.py [OPTIONS] [ARGUMENTS]\n")
+        print("-------")
+        print("Options")
+        print("-------\n")
+        print("--version       print version and exit")
+        print("--help          show this message and exit")
+        print("--username      Cello Username")
+        print("--password      Cello Password")
+        print("--ucf           UCF file to be used by Cello")
+        print("--results       name of text file to save Cello results\n")
+        sys.exit()
+    elif sys.argv[1]=="--version":
+        print("Optrion version: 1.0")
+        sys.exit()
+    else:
+        if "username" in sys.argv:
+            uname = sys
+    UCFname, vFile, uname, pword, jobID, resultsFile = get_user_inputs()
+    
     ed = UCFEditor()
     
     UCFname = "testUCF.UCF.json"
@@ -106,3 +133,5 @@ if __name__ == '__main__':
                                            proms_params_n, reps_params_n,
                                            rp_copy_n, change_log)
         print(scoreFunction(assembly_order_n, [proms_params,rp_copy_n]))
+        
+#    print(change_log_n)
