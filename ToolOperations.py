@@ -50,30 +50,28 @@ def calcScore(yvals,table):
     score = on_min / off_max
     return score
 
-def calcValues(dataIn, state, inVals):
+def calcValues(dataIn, table, inVals):
     """
-    takes a list of params and calculates input and output values for the
-    repressor.
-    dataIn of the form: (ymax ymin K n [thresh])
-    state is the on/off state matrix (i.e. 0 0 0 1)
+    takes repressor params and calculates y values given inVals
+    dataIn of the form: [ymax, ymin, K, n, [thresh]]
+    table is the on/off table (e.g., [0, 0, 0, 1])
     inVals is a list of numbers at which output value "y" is calculated
     """
     ymax, ymin, K, n, thresh = dataIn
-    yvals = [0]* len(state)
-    for i in range(len(state)):
+    yvals = [0]* len(table)
+    for i in range(len(table)):
         yvals[i] = ymin + (ymax - ymin)/(1 + (inVals[i]/K)**n)
     return yvals
 
 def assemble(gate, params, stored_value):
     """
-    takes the gate name, params, and dictionary to store gate values in order
-    to correctly process each of the gates:
-        An input gate will have its values processed in the correct order for
-        the gate it will act as an input for.
-        A Nor/Not gate will take the input values and the function will be
-        evaluted to ensure the values comply with the new on/off threshholds.
-        The Output gate will calculate the score.
-    It should be used in a for-loop calling the gates in the proper order.
+    Processes each gate according to type:
+        Input gate will have its on/off values put in the correct order
+        Nor/Not gate will use its input values to calculate the output, and
+            verifies the inputs comply with the truth table
+        Output gate calculates the score
+    Inputs: gate type, [params], {stored gate values}
+    It should be used in a for-loop that calls the gates in the proper order.
     See: scoreFunction
     """
 #    print('current gate:',gate.get_name())
