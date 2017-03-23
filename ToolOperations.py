@@ -74,20 +74,15 @@ def assemble(gate, params, stored_value):
     It should be used in a for-loop that calls the gates in the proper order.
     See: scoreFunction
     """
-#    print('current gate:',gate.get_name())
-#    print('stored val:',stored_value)
     if str(gate) in "Input":
         if gate.get_name() in params[0]:
             vals = params[0][gate.get_name()]
             otpt = gate.get_outputs()[0]
-#            otptName = output[0].get_name()
-#            print('outputName:',otptName)
             table = gate.get_table()
             stored_value[gate.get_name()] = []
             for i in table:
                 # this should store the on/off values in truth table order
                 stored_value[gate.get_name()] += [vals[i]]
-#            print(stored_value[gate.get_name()])
     elif str(gate) in ("Not","Nor"):
         inVals = []
         if gate.get_name() in params[1]:
