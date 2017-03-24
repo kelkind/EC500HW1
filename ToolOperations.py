@@ -21,16 +21,13 @@ def checkThresh(inVals, dataIn, table):
     """
     checks = 1
     ymax, ymin, K, n, thresh = dataIn
-#    print('on:',thresh[0],'off:',thresh[1])
     for i in range(len(table)):
-#        print('val:',inVals[i],'state:',table[i])
         if table[i] == 0:
             if inVals[i] < thresh[1]:
                 checks += 1                
         elif table[i] == 1:
             if inVals[i] > thresh[0]:
                 checks += 1
-#    print(checks)
     return checks
 
 def calcScore(yvals,table):
@@ -74,20 +71,14 @@ def assemble(gate, params, stored_value):
     It should be used in a for-loop that calls the gates in the proper order.
     See: scoreFunction
     """
-#    print('current gate:',gate.get_name())
-#    print('stored val:',stored_value)
     if str(gate) in "Input":
         if gate.get_name() in params[0]:
             vals = params[0][gate.get_name()]
-            otpt = gate.get_outputs()[0]
-#            otptName = output[0].get_name()
-#            print('outputName:',otptName)
             table = gate.get_table()
             stored_value[gate.get_name()] = []
             for i in table:
-                # this should store the on/off values in truth table order
+                # stores the on/off input values in truth table order
                 stored_value[gate.get_name()] += [vals[i]]
-#            print(stored_value[gate.get_name()])
     elif str(gate) in ("Not","Nor"):
         inVals = []
         if gate.get_name() in params[1]:
@@ -185,5 +176,4 @@ def modifyGate(dataIn, modtype, scale_factor):
             K_new = K * scale_factor
         thresh_new = calcThresh([ymax,ymin,K_new,n])
         dataOut = [ymax, ymin, K_new, n, thresh_new]
-#    print(modtype,'thr:',thresh_new)
     return dataOut

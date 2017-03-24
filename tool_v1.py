@@ -184,20 +184,15 @@ if __name__ == "__main__":
                 
     ed = UCFEditor()
 
-    print('name',uname)
-    print('pw',password)
-    print('ucf',UCFname)
-    print('veri',vFile)
-    print('job',jobID)
-    print('res',resultsFile)
-#    UCFname = "testUCF.UCF.json"
-#    vFile = "./0xFE.v"
-#    uname = "kelkind"
-#    pword = "4L83rtO1"
-#    jobID = "Kat_Evan_Test"
-#    resultsFile = "Results_0xFE.txt"
+#    print('name',uname)
+#    print('pw',password)
+#    print('ucf',UCFname)
+#    print('veri',vFile)
+#    print('job',jobID)
+#    print('res',resultsFile)
+
     
-#    run_Cello(UCFname, vFile, uname, pword, jobID, resultsFile)
+    run_Cello(UCFname, vFile, uname, password, jobID, resultsFile)
 
     circuit_tree = parse_cello_results_file(resultsFile)
 
@@ -207,7 +202,7 @@ if __name__ == "__main__":
         populate_params(circuit_tree, ed)
 
     score = scoreFunction(assembly_order, [proms_params,reps_params])
-    print(score)
+    print('Your initial score is ' + str(score))
 
     # optimizes the solution
     change_log = {}
@@ -216,18 +211,15 @@ if __name__ == "__main__":
 
     # calculates and prints the score of the optimized function
     opt_score = scoreFunction(assembly_order, [proms_params,rp_copy])
-    print('Final Score:', opt_score)
     
     for gate in reps:    
-#        print(gate,":")
-#        print(rp_copy[gate])
         ed.set_repressor_params(gate,rp_copy[gate])
     
     ed.save_ucf_to_json("./" + UCFname)
     
     resultsFile = "verifyresults" + vFile[2:-2] + ".txt"
     jobID = jobID + "1"
-#    run_Cello(UCFname, vFile, uname, pword, jobID, resultsFile)
+    run_Cello(UCFname, vFile, uname, password, jobID, resultsFile)
     
     circuit_tree_new = parse_cello_results_file(resultsFile)
 
@@ -235,7 +227,7 @@ if __name__ == "__main__":
         rp_copy_n = populate_params(circuit_tree_new, ed)
 
     new_score = scoreFunction(assembly_order_n, [proms_params_n, reps_params_n])
-    print(new_score)
+#    print(new_score)
 #    print(change_log)
     if new_score > opt_score:
         opsList = ['stretch','incSlope','decSlope','strProm','wkProm','strRBS',
@@ -249,6 +241,13 @@ if __name__ == "__main__":
         rp_copy_n, change_log_n = optimize(assembly_order_n, opt_score,
                                            proms_params_n, reps_params_n,
                                            rp_copy_n, change_log)
-        print(scoreFunction(assembly_order_n, [proms_params,rp_copy_n]))
+        new_score = scoreFunction(assembly_order_n, [proms_params,rp_copy_n])
+#        print(scoreFunction(assembly_order_n, [proms_params,rp_copy_n]))
         
 #    print(change_log_n)
+    print(new_score)
+    print('Your Optimized Score is ' + str(new_score))
+    print('Using the Following Changes:')
+    for key in change_log:
+        print(str(key) + ": " + change_log[key])
+    print('See your modified UCF file for details.')

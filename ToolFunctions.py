@@ -39,74 +39,58 @@ def populate_params(circuit_tree, ed):
 
 def optimize(assembly_order, score, proms_params, reps_params, rp_copy,
              change_log):
+    # initialize relevant variables and lists
     opsList = ['stretch','incSlope','decSlope','strProm','wkProm','strRBS',
                'wkRBS']
     temp_params, temp_score = {}, {},
-    oldScore, maxScoreVal = [score], 0 
+    maxScoreVal = 0 
+    protOps = ["stretch", "incSlope", "decSlope"]
+
     if change_log != {}:
         CL_n = change_log.copy()
     else:
         CL_n = change_log
+    # optimization
     for g in assembly_order: 
         if isinstance(g, Output):
             pass
         elif isinstance(g, Input):
             pass
         else:
-            i = 0
             gate = g.get_name()
-#            print('gate:',gate)
             temp_params[gate], temp_score[gate] = {}, {}
-            while maxScoreVal <= oldScore[i-1]:
-                for op in opsList:
-#                    print('op:',op)
-                    try:
-                        if op in change_log[gate]:
-                            continue
-                    except:
-                        pass
-                    if "stretch" in op:
-                        linmax = 1.5
-                    elif "Slope" in op:
-                        linmax = 1.05
-                    else:
-                        linmax = 2
-#                    print('calculating...')
-                    for sf in np.linspace(0.05,linmax,30):
-                        temp_params[gate][op] = modifyGate(reps_params[gate],op,sf)
-                        rp_copy[gate] = temp_params[gate][op]
-                        temp_score[gate][op] = scoreFunction(assembly_order,
-                                  [proms_params,rp_copy])
-                        
-                maxScore = max(temp_score[gate], key=lambda key: temp_score[gate][key])
-                maxScoreVal = temp_score[gate][maxScore]       
-#                        
-#                currentScores = sorted(temp_score[gate].values(), reverse="True")
-#                for op, sc in temp_score[gate].iteritems():
-#                    if sc == currentScores[0]:
-#                        maxScore = op
-                engOps = ["stretch", "incSlope", "decSlope"]
-                if maxScore in engOps:
-                    subList = temp_score[gate].copy()
-                    for item in engOps:
-                        del subList[item]
-                    secondMax = max(subList, key=lambda key: subList[key])
-                    secondMaxVal = subList[secondMax]
-                    if maxScoreVal - secondMaxVal < 5:
-                        maxScore = secondMax
-                        maxScoreVal = secondMaxVal
+            for op in opsList:
+                try:
+                    if op in change_log[gate]:
+                        continue
+                except:
+                    pass
+                if "stretch" in op:
+                    linmax = 1.5
+                elif "Slope" in op:
+                    linmax = 1.05
+                else:
+                    linmax = 5
+                for sf in np.linspace(0.25,linmax,30):
+                    temp_params[gate][op] = modifyGate(reps_params[gate],op,sf)
+                    rp_copy[gate] = temp_params[gate][op]
+                    temp_score[gate][op] = scoreFunction(assembly_order,
+                              [proms_params,rp_copy])
+            maxScore = max(temp_score[gate], key=lambda key: temp_score[gate][key])
+            maxScoreVal = temp_score[gate][maxScore]       
+            if maxScore in protOps:
+                subList = temp_score[gate].copy()
+                for item in protOps:
+                    del subList[item]
+                secondMax = max(subList, key=lambda key: subList[key])
+                secondMaxVal = subList[secondMax]
+                if (maxScoreVal - secondMaxVal) < 50:
+                    maxScore = secondMax
+                    maxScoreVal = secondMaxVal
+            # checks score is higher than original score to decide to keep change
+            if temp_params[gate][maxScore] < score:
+                CL_n[gate] = 'None'
+            else:
                 CL_n[gate] = maxScore
-                if i == 0:
-                    break
-                if maxScoreVal < oldScore[i-1]:
-                    rp_copy[reps[i-1]] = temp_params[reps[i-1]][oldScore]
-#            print(maxScore)
-#            print(temp_score[gate])
-#            print(maxScore,':',temp_score[gate][maxScore])
-            rp_copy[gate] = temp_params[gate][maxScore] # keeps highest scoring change
-            try:
-                oldScore[i] = temp_score[gate][maxScore]
-            except:
-                oldScore += [temp_score[gate][maxScore]]
-            i += 1
+                rp_copy[gate] = temp_params[gate][maxScore]
     return rp_copy, CL_n
