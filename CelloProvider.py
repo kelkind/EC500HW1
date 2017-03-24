@@ -11,6 +11,13 @@ class CelloConnectionError(Exception):
                 self.message = "Cello connection refused"
 
 class CelloResultHandle:
+        """A handle which points to a result file stored on CelloCad.org
+        
+        Via a result handle, you can download the result file that it points
+        to, or get its name. CelloResultHandle internally stores a reference
+        to the CelloConnection that created it, because the download_to_file 
+        method requires an existing CelloConnection.
+        """
         def __init__(self, file_name, job_name, connection):
                 self._file_name = file_name
                 self._job_name = job_name
@@ -20,6 +27,7 @@ class CelloResultHandle:
                 return self._file_name
 
         def download_to_file(self, file_name):
+                """Downloads a file from CelloCad.org to the current working directory"""
                 r = requests.get(_cello_url + "/results/" +
                                  self._job_name + "/" + self._file_name,
                                  auth = self._connection._auth)
@@ -31,10 +39,22 @@ class CelloResultHandle:
 
         
 class CelloConnection:
+        """A wrapper class that provides easy access to CelloCad.org
+        
+        CelloConnection supports a large subset of the Cello API's 
+        functionality, if not all of it. You can upload and delete UCF
+        files, run a netsynth, submit and delete jobs, and get the 
+        results of a completed job.
+
+        It is our opinion that this interface is easier to use than 
+        Pycello.
+        """
         def __init__(self, auth):
+                """Initialize a Cello connection by providing user authentication info (as a tuple)"""
                 self._auth = auth
 
         def upload_ucf(self, file_path):
+                """Upload a UCF file to CelloCad.org"""
                 upload_name = ntpath.basename(file_path)
                 if not upload_name:
                         raise CelloConnectionError()
@@ -54,12 +74,14 @@ class CelloConnection:
                         raise RuntimeError("UCF validation failed")
 
         def delete_ucf(self, ucf_file_name):
+                """Delete a UCF file from CelloCad.org"""
                 r = requests.delete(_cello_url + "/ucf/" + ucf_file_name,
                                     auth = self._auth)
                 if r.status_code != 200:
                         raise CelloConnectionError()
                 
         def netsynth(self, file_path):
+                """Run a netsynth, and get the results as plain text"""
                 with open(file_path, "r") as content_file:
                         content = content_file.read()
                         r = requests.post(_cello_url + "/netsynth",
@@ -75,6 +97,7 @@ class CelloConnection:
                        promoter_path,
                        outputs_path,
                        opt_str = ""):
+                """Submit a job to run on CelloCad's server"""
                 with open(verilog_path, "r") as v, open(promoter_path, "r") as p, open(outputs_path, "r") as o:
                         v_content = v.read()
                         p_content = p.read()
@@ -90,12 +113,19 @@ class CelloConnection:
                                 raise CelloConnectionError()
 
         def delete_job(self, job_name):
+                """Delete a job from the CelloCad server"""
                 r = requests.delete(_cello_url + "/results/" + job_name,
                                     auth = self._auth)
                 if r.status_code != 200:
                         raise CelloConnectionError()
 
         def get_job_results(self, job_name):
+                """Get the results of a complete job from the CelloCad server
+
+                Returns a list of CelloResultHandle instances, which can each
+                be downloaded individually as needed after introspecting their
+                file names.
+                """
                 r = requests.get(_cello_url + "/results/" + job_name,
                                  auth = self._auth);
                 if r.status_code != 200:
