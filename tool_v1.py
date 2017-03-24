@@ -6,9 +6,7 @@ from UCFEditor import UCFEditor
 from ParseResults import *
 from ToolOperations import *
 from ToolFunctions import *
-import sys
-#import numpy as np
-
+import sys, getopt
   
 def get_user_inputs():
     """
@@ -47,38 +45,157 @@ def run_Cello(UCFname, vFile, uname, pword, jobID, resultsFile):
     for result in cello.get_job_results(jobID):
         if "logic_circuit.txt" in result.get_name():
             result.download_to_file("./" + resultsFile)
+#
+#def main(argv):
+#    """
+#    Main Argument
+#    """
+#    
+#    if len(argv) == 1:
+#        help_Script()
+#    elif len(argv) == 2:
+#        if argv[1] == "-version":
+#            print("Optron version: 1.0")
+#            sys.exit()
+#        if argv[1] == "-help":
+#            help_Script()
+#            
+#    else:
+#        try:
+#            opts, args = getopt.getopt(argv[1:],"",["username="
+#                                       "password=","ucf=","verilog=","jobid=",
+#                                       "results="])
+#        except getopt.GetoptError:
+#            print("try Optron.py -help for a list of valid commands")
+#            sys.exit()
+#    print(opts)
+#    print(args)
+#    for opt, arg in opts:
+#        if opt in "-version":
+#            print("Optron version: 1.0")
+#            sys.exit()
+#        elif opt in "-username":
+#            uname = arg
+#        elif opt in "-password":
+#            pword = arg
+#        elif opt in "-ucf":
+#            if arg.endswith(".UCF.json"):
+#                UCFname = arg
+#            else:
+#                print("Invalid UCF filename. Filename must end with '.UCF.json'") 
+#                sys.exit()
+#        elif opt in "-verilog":
+#            vFile = arg
+#        elif opt in "-jobid":
+#            jobID = arg
+#        elif opt in "-results":
+#            if ".txt" in arg:
+#                resultsFile = arg
+#            else:
+#                resultsFile = arg + ".txt"
+#        else:
+#            help_Script()
+#    # check for optional outputs:
+#    try:
+#        jobID
+#    except:
+#        jobID = UCFname[:-9]
+#    try:
+#        resultsFile
+#    except:
+#        resultsFile = UCFname[:-9] + ".txt"
+#    
+#    return uname, pword, UCFname, vFile, jobID, resultsFile
 
+def usage():
+    print("Welcome to Optron, the Cello Optimization Tool")
+    print("Usage: Optron.py [OPTIONS] [ARGUMENTS]\n")
+    print("-------")
+    print("Options")
+    print("-------\n")
+    print("-version       print version and exit")
+    print("-help          show this message and exit")
+    print("-username      Cello Username")
+    print("-password      Cello Password")
+    print("-ucf           UCF file to be used by Cello")
+    print("-verilog       Verilog file of logic circuit")
+    print("-jobid         Job ID in Cello (optional)")
+    print("-results       name of text file to save Cello results (optional)\n")
+    sys.exit(2)
+	
+def verify_no_required_opts_missing(parsed_fields):
+    for key in parsed_fields:
+        if not parsed_fields[key]:
+            print("Error, missing required parameter: " + key)
+            usage()
 
-if __name__ == '__main__':
-    if len(sys.argv)==1 or sys.argv[1]=="--help":
-        print("Welcome to Optron, the Cello Optimization Tool")
-        print("Usage: Optron.py [OPTIONS] [ARGUMENTS]\n")
-        print("-------")
-        print("Options")
-        print("-------\n")
-        print("--version       print version and exit")
-        print("--help          show this message and exit")
-        print("--username      Cello Username")
-        print("--password      Cello Password")
-        print("--ucf           UCF file to be used by Cello")
-        print("--results       name of text file to save Cello results\n")
-        sys.exit()
-    elif sys.argv[1]=="--version":
-        print("Optrion version: 1.0")
-        sys.exit()
-    else:
-        if "username" in sys.argv:
-            uname = sys
-    UCFname, vFile, uname, pword, jobID, resultsFile = get_user_inputs()
-    
+def parse_opts():
+    results = {
+        "name": None,
+        "password": None,
+        "ucf": None,
+        "verilog": None,
+        "jobid": "OptronRun",
+        "results": "OptronResults.txt"
+        }
+    for o, a in opts:
+        if o in ("-n", "--name"):
+            results["name"] = a
+        elif o in ("-p", "--password"):
+            results["password"] = a
+        elif o in ("-u", "--ucf"):
+            results["ucf"] = a
+        elif o in ("-v", "--verilog"):
+            results["verilog"] = a
+        elif o in ("-j", "--jobid"):
+            results["jobid"] = a
+        elif o in ("-r", "--results"):
+            results["results"] = a
+    verify_no_required_opts_missing(results)
+    return results
+
+if __name__ == "__main__":
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "n:p:u:v:j:r:", ["name=", "password=", "ucf=", "verilog=", "jobid=", "results="])
+    except getopt.GetoptError as err:
+        print(str(err))
+        usage()
+    opt_data = parse_opts()
+    for key in opt_data:
+        if key in "name":
+            uname = opt_data[key]
+        elif key in "password":
+            password = opt_data[key]
+        elif key in "ucf":
+            UCFname = opt_data[key]
+            while UCFname.endswith(".UCF.json") == 0:
+                print("Invalid UCF filename! Filename must end with '.UCF.json'")
+                UCFname = raw_input("Enter valid UCF file name: ")
+        elif key in "verilog":
+            vFile = opt_data[key]
+            if vFile.startswith("./") == 0:
+                vFile = "./" + vFile
+        elif key in "jobid":
+            jobID = opt_data[key]
+        elif key in "results":
+            resultsFile = opt_data[key]
+            if resultsFile.endswith(".txt") == 0:
+                resultsFile = resultsFile + ".txt"
+                
     ed = UCFEditor()
-    
-    UCFname = "testUCF.UCF.json"
-    vFile = "./0xFE.v"
-    uname = "kelkind"
-    pword = "4L83rtO1"
-    jobID = "Kat_Evan_Test"
-    resultsFile = "Results_0xFE.txt"
+
+    print('name',uname)
+    print('pw',password)
+    print('ucf',UCFname)
+    print('veri',vFile)
+    print('job',jobID)
+    print('res',resultsFile)
+#    UCFname = "testUCF.UCF.json"
+#    vFile = "./0xFE.v"
+#    uname = "kelkind"
+#    pword = "4L83rtO1"
+#    jobID = "Kat_Evan_Test"
+#    resultsFile = "Results_0xFE.txt"
     
 #    run_Cello(UCFname, vFile, uname, pword, jobID, resultsFile)
 

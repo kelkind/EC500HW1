@@ -76,10 +76,26 @@ def optimize(assembly_order, score, proms_params, reps_params, rp_copy,
                         temp_params[gate][op] = modifyGate(reps_params[gate],op,sf)
                         rp_copy[gate] = temp_params[gate][op]
                         temp_score[gate][op] = scoreFunction(assembly_order,
-                                  [proms_params,rp_copy])      
+                                  [proms_params,rp_copy])
+                        
                 maxScore = max(temp_score[gate], key=lambda key: temp_score[gate][key])
+                maxScoreVal = temp_score[gate][maxScore]       
+#                        
+#                currentScores = sorted(temp_score[gate].values(), reverse="True")
+#                for op, sc in temp_score[gate].iteritems():
+#                    if sc == currentScores[0]:
+#                        maxScore = op
+                engOps = ["stretch", "incSlope", "decSlope"]
+                if maxScore in engOps:
+                    subList = temp_score[gate].copy()
+                    for item in engOps:
+                        del subList[item]
+                    secondMax = max(subList, key=lambda key: subList[key])
+                    secondMaxVal = subList[secondMax]
+                    if maxScoreVal - secondMaxVal < 5:
+                        maxScore = secondMax
+                        maxScoreVal = secondMaxVal
                 CL_n[gate] = maxScore
-                maxScoreVal = temp_score[gate][maxScore]
                 if i == 0:
                     break
                 if maxScoreVal < oldScore[i-1]:
